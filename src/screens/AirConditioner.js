@@ -174,78 +174,79 @@ const AirConditioner = () => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.container}>
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.iconText}>←</Text>
+            <Text style={styles.headerIcon}>{'←'}</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Điều khiển máy lạnh</Text>
           <TouchableOpacity
             style={styles.scheduleButton}
             onPress={() => navigation.navigate('Schedule')}
           >
-            <Text style={styles.iconText}>📅</Text>
+            <Text style={styles.headerIcon}>{'⏰'}</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.controlContainer}>
+        {/* Card trạng thái & nhiệt độ */}
+        <View style={styles.statusCard}>
+          <Text style={styles.statusLabel}>Trạng thái máy lạnh</Text>
+          <Text style={[styles.statusValue, isACOn ? styles.statusOn : styles.statusOff]}>
+            {isACOn ? '● ĐANG BẬT' : '○ ĐANG TẮT'}
+          </Text>
+          <Text style={styles.sensorTempCard}>Nhiệt độ phòng: <Text style={{fontWeight:'bold'}}>{sensorTemp.toFixed(1)}°C</Text></Text>
+        </View>
+
+        {/* Card điều khiển ON/OFF */}
+        <View style={styles.controlCard}>
           <TouchableOpacity
-            style={[styles.button, isACOn && styles.buttonActive]}
+            style={[styles.bigButton, isACOn && styles.bigButtonActive]}
             onPress={() => handleACControl('ON')}
             disabled={isLoading}
           >
-            <Text style={[styles.iconText, isACOn && styles.buttonTextActive]}>⚡</Text>
-            <Text style={[styles.buttonText, isACOn && styles.buttonTextActive]}>
-              {isLoading ? 'Đang xử lý...' : 'ON'}
+            <Text style={[styles.bigButtonLabel, isACOn && styles.bigButtonTextActive]}>
+              {isLoading ? '...' : 'BẬT'}
             </Text>
           </TouchableOpacity>
-
           <TouchableOpacity
-            style={[styles.button, !isACOn && styles.buttonActive]}
+            style={[styles.bigButton, !isACOn && styles.bigButtonActive]}
             onPress={() => handleACControl('OFF')}
             disabled={isLoading}
           >
-            <Text style={[styles.iconText, !isACOn && styles.buttonTextActive]}>⭕</Text>
-            <Text style={[styles.buttonText, !isACOn && styles.buttonTextActive]}>
-              {isLoading ? 'Đang xử lý...' : 'OFF'}
+            <Text style={[styles.bigButtonLabel, !isACOn && styles.bigButtonTextActive]}>
+              {isLoading ? '...' : 'TẮT'}
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Temperature Control */}
-        <View style={styles.temperatureContainer}>
-          <Text style={styles.temperatureTitle}>Nhiệt độ cài đặt: {temperature}°C</Text>
-          <Text style={styles.sensorTemp}>Nhiệt độ phòng: {sensorTemp.toFixed(1)}°C</Text>
-          {isACOn && (
-            <Text style={styles.countdownText}>
-              Kiểm tra nhiệt độ sau: {countdown} giây
-            </Text>
-          )}
-          <View style={styles.temperatureControls}>
+        {/* Card điều chỉnh nhiệt độ */}
+        <View style={styles.tempCard}>
+          <Text style={styles.tempTitle}>Nhiệt độ cài đặt</Text>
+          <View style={styles.tempRow}>
             <TouchableOpacity
               style={[styles.tempButton, !isACOn && styles.tempButtonDisabled]}
               onPress={() => handleTemperatureChange(temperature - 1)}
               disabled={!isACOn || isLoading}
             >
-              <Text style={[styles.iconText, !isACOn && styles.tempButtonDisabled]}>-</Text>
+              <Text style={styles.tempButtonText}>▼</Text>
             </TouchableOpacity>
-            
+            <Text style={styles.tempValue}>{temperature}°C</Text>
             <TouchableOpacity
               style={[styles.tempButton, !isACOn && styles.tempButtonDisabled]}
               onPress={() => handleTemperatureChange(temperature + 1)}
               disabled={!isACOn || isLoading}
             >
-              <Text style={[styles.iconText, !isACOn && styles.tempButtonDisabled]}>+</Text>
+              <Text style={styles.tempButtonText}>▲</Text>
             </TouchableOpacity>
           </View>
-        </View>
-
-        <View style={styles.statusContainer}>
-          <Text style={styles.statusText}>
-            Trạng thái hiện tại: {isLoading ? 'Đang tải...' : (isACOn ? 'Đang bật' : 'Đang tắt')}
-          </Text>
+          {isACOn && (
+            <Text style={styles.countdownText}>
+              ⏳ Kiểm tra sau: <Text style={{fontWeight:'bold'}}>{countdown}s</Text>
+            </Text>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -255,116 +256,162 @@ const AirConditioner = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8fafc',
   },
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 16,
+    backgroundColor: '#f8fafc',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 32,
-    paddingHorizontal: 16,
+    marginBottom: 24,
+    paddingHorizontal: 8,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
+  headerIcon: {
+    fontSize: 28,
+    color: '#4f8cff',
+    padding: 4,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222',
     flex: 1,
     textAlign: 'center',
   },
-  controlContainer: {
+  statusCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 24,
+    marginBottom: 18,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  statusLabel: {
+    fontSize: 16,
+    color: '#888',
+    marginBottom: 6,
+  },
+  statusValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  statusOn: {
+    color: '#4f8cff',
+  },
+  statusOff: {
+    color: '#bbb',
+  },
+  sensorTempCard: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 4,
+  },
+  controlCard: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 32,
+    marginBottom: 18,
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 18,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  button: {
+  bigButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 15,
-    width: 120,
-    elevation: 2,
+    backgroundColor: '#f3f6fa',
+    borderRadius: 16,
+    width: 110,
+    height: 110,
+    marginHorizontal: 8,
+    borderWidth: 2,
+    borderColor: '#e0e7ef',
   },
-  buttonActive: {
-    backgroundColor: '#81b0ff',
+  bigButtonActive: {
+    backgroundColor: '#4f8cff',
+    borderColor: '#4f8cff',
   },
-  buttonText: {
-    marginTop: 8,
-    fontSize: 18,
+  bigButtonText: {
+    fontSize: 38,
+    color: '#4f8cff',
     fontWeight: 'bold',
-    color: '#81b0ff',
   },
-  buttonTextActive: {
+  bigButtonTextActive: {
     color: '#fff',
   },
-  temperatureContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  temperatureTitle: {
-    fontSize: 24,
+  bigButtonLabel: {
+    fontSize: 18,
+    marginTop: 8,
+    color: '#4f8cff',
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
   },
-  temperatureControls: {
+  tempCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    marginBottom: 18,
+  },
+  tempTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#222',
+    marginBottom: 12,
+  },
+  tempRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 32,
+    marginBottom: 10,
   },
   tempButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#fff',
+    backgroundColor: '#f3f6fa',
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 2,
+    marginHorizontal: 16,
+    borderWidth: 2,
+    borderColor: '#e0e7ef',
   },
   tempButtonDisabled: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f0f0f0',
+    borderColor: '#e0e0e0',
   },
-  statusContainer: {
-    alignItems: 'center',
-    marginTop: 16,
+  tempButtonText: {
+    fontSize: 28,
+    color: '#4f8cff',
+    fontWeight: 'bold',
   },
-  statusText: {
-    fontSize: 18,
-    color: '#666',
-  },
-  scheduleButton: {
-    padding: 8,
-  },
-  sensorTemp: {
-    fontSize: 18,
-    color: '#666',
-    marginTop: 8,
-    marginBottom: 16,
+  tempValue: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#4f8cff',
+    marginHorizontal: 12,
   },
   countdownText: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 15,
+    color: '#888',
     marginTop: 8,
-    marginBottom: 16,
     fontWeight: '500',
   },
-  iconText: {
-    fontSize: 24,
-    color: '#81b0ff',
+  scheduleButton: {
+    padding: 4,
   },
 });
 
